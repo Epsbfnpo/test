@@ -1,0 +1,360 @@
+<script setup lang='ts'>
+import katex from 'katex';
+
+class Drug {
+  plasmaConcentration: number;
+  amountInGut: number;
+  amountInBody: number;
+  dataPoints: Array<{ time: number, concentration: number }> = [];
+
+  constructor(
+      public name: string,
+      public dose: number,
+      public Ka: number,
+      public Ke: number,
+      public Vd: number
+  ) {
+    this.plasmaConcentration = 0;
+    this.amountInGut = this.dose;
+    this.amountInBody = 0;
+  }
+
+  updateConcentration(dt: number) {
+    let absorption = this.Ka * this.amountInGut * dt;
+    let elimination = this.Ke * this.amountInBody * dt;
+
+    this.amountInGut -= absorption;
+    this.amountInBody += absorption - elimination;
+    this.plasmaConcentration = this.amountInBody / this.Vd;
+    const time = this.dataPoints.length;
+    this.dataPoints.push({ time, concentration: this.plasmaConcentration });
+  }
+
+  timeToHalfLife() {
+    return Math.log(2) / this.Ke;
+  }
+}
+
+const drugs = ref<Drug[]>([]);
+const isSimulating = ref(false);
+const isChartVisible = ref(true);
+let timerId: any;
+
+const initialDose = ref<number>(100);
+const Ka = ref<number>(0.1);
+const Ke = ref<number>(0.05);
+const Vd = ref<number>(1);
+
+
+const isDoseBeingChanged = ref(false);
+const isKaBeingChanged = ref(false);
+const isKeBeingChanged = ref(false);
+const isVdBeingChanged = ref(false);
+
+function createDrugAndStartSimulation() {
+  const drug = new Drug("UserDefinedDrug", initialDose.value, Ka.value, Ke.value, Vd.value);
+  drugs.value = [drug];
+  isSimulating.value = true;
+  isChartVisible.value = true;
+  startSimulation();
+}
+
+function startSimulation() {
+  if (timerId) {
+    clearInterval(timerId);
+  }
+  timerId = setInterval(() => {
+    drugs.value.forEach(drug => {
+      drug.updateConcentration(1);
+    });
+  }, 1000);
+}
+
+function stopSimulation() {
+  clearInterval(timerId);
+}
+
+function toggleSimulation() {
+  if (isSimulating.value) {
+    stopSimulation();
+  } else {
+    startSimulation();
+  }
+  isSimulating.value = !isSimulating.value;
+}
+
+onBeforeUnmount(stopSimulation);
+
+function formatFormulaPart(param: string, isBeingChanged: boolean): string {
+  if (isBeingChanged) {
+    return `\\color{red}{${param}}`;
+  }
+  return `{${param}}`;
+}
+
+const formulaParts = computed(() => {
+  return {
+    F: formatFormulaPart("Dose", isDoseBeingChanged.value),
+    ka: formatFormulaPart("k_a", isKaBeingChanged.value),
+    ke: formatFormulaPart("k_e", isKeBeingChanged.value),
+    Vd: formatFormulaPart("Vd", isVdBeingChanged.value)
+  };
+});
+
+const renderedFormula = computed(() => {
+  const { F, ka, ke, Vd } = formulaParts.value;
+  const formulaContent = `\\begin{equation} C = \\frac{F.{${F}}.{${ka}}}{{${Vd}}({${ka}}-{${ke}})} *(e^{-{${ke}} t} - e^{-{${ka}} t}) \\end{equation}`;
+  return katex.renderToString(formulaContent, {
+    displayMode: true
+  });
+});
+
+const series = computed(() => {
+  return drugs.value.map(drug => ({
+    name: drug.name,
+    data: drug.dataPoints.map(point => point.concentration)
+  }));
+});
+
+const staticXaxis = computed(() => {
+  return {
+    categories: staticSeries.value[0].data.map((_, idx) => idx)
+  };
+});
+
+const staticSeries = computed(() => {
+  const points = [];
+  for (let t = 0; t <= 100; t++) {
+    const F = initialDose.value;
+    const concentration = (F * Ka.value) / (Vd.value * (Ka.value - Ke.value)) *
+        (Math.exp(-Ke.value * t) - Math.exp(-Ka.value * t));
+    points.push({ time: t, concentration });
+  }
+  return [{
+    name: "StaticPlot",
+    data: points.map(point => point.concentration)
+  }];
+});
+
+const xaxis = computed(() => {
+  return {
+    categories: drugs.value.length > 0 ? drugs.value[0].dataPoints.map(point => point.time) : []
+  };
+});
+
+const chartOptions = computed(() => ({
+  title:{
+    text: 'Oral Dosing Plasma-time Curve (Dynamic)',
+    align: 'center'
+  },
+  chart: {
+    type: 'line',
+    height: 350,
+    zoom: {
+      enabled: false
+    }
+  },
+  dataLabels: {
+    enabled: false
+  },
+  stroke: {
+    curve: 'smooth'
+  },
+  xaxis: {
+    ...xaxis.value,
+    title: {
+      text: 'Time (h)'
+    },
+    tickAmount: 10,
+  },
+  yaxis: {
+    title: {
+      text: 'Plasma Concentration (mg/L)'
+    },
+    labels: {
+      formatter: (value) => {
+        return value.toFixed(2);
+      }
+    },
+    min: 0,
+  },
+  tooltip: {
+    x: {
+      show: true,
+      title: {
+        formatter: () => 'Time (h)'
+      }
+    },
+    y: {
+      title: {
+        formatter: (seriesName) => 'Plasma Concentration (mg/L)'
+      }
+    }
+  }
+}));
+
+const staticChartOptions = computed(() => ({
+  ...chartOptions.value,
+  title: {
+    text: 'Oral Dosing Plasma-time Curve (Static)',
+    align: 'center'
+  },
+  xaxis: {
+    ...staticXaxis.value,
+    title: {
+      text: 'Time (h)'
+    },
+    tickAmount: 10
+  }
+}));
+
+
+</script>
+
+<template>
+  <v-card class='mt-2'>
+    <v-card-title>
+      <h1 class="text-h5">Welcome to the oralDosingPlasmaTimeCurve.vue</h1>
+    </v-card-title>
+    <v-card-text>
+      <div class="text-intro">
+        <strong><em>After a while thinking deeply about the single IV plasma-time curve you will be ready to think about the more general but more complicated single oral dose plasma-time curve. This introduces another variable which is the absorption rate constant but it is still a relatively simple situation since we are not looking at multiple doses or considering other factors affecting drug disposition.</em></strong>
+      </div>
+
+      <v-row class='mx-3 mt-2'>
+        <v-col cols="12" md="3">
+          <v-text-field
+              label="Dose (Initial Dose Concentration)"
+              v-model="initialDose"
+              type="number"
+              :step="0.1"
+              @input="isDoseBeingChanged = true"
+              @blur="isDoseBeingChanged = false"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="12" md="9">
+          <v-slider
+              label="Dose (Initial Dose Concentration)"
+              v-model="initialDose"
+              step="0.1"
+              :min="0"
+              :max="500"
+              thumb-label="always"
+              @mousedown.native="isDoseBeingChanged = true"
+              @mouseup.native="isDoseBeingChanged = false"
+          ></v-slider>
+        </v-col>
+
+        <v-col cols="12" md="3">
+          <v-text-field
+              label="Ka (Absorption rate constant)"
+              v-model="Ka"
+              type="number"
+              :step="0.01"
+              @input="isKaBeingChanged = true"
+              @blur="isKaBeingChanged = false"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="12" md="9">
+          <v-slider
+              label="Ka (Absorption rate constant)"
+              v-model="Ka"
+              step="0.01"
+              :min="0"
+              :max="5"
+              thumb-label="always"
+              @mousedown.native="isKaBeingChanged = true"
+              @mouseup.native="isKaBeingChanged = false"
+          ></v-slider>
+        </v-col>
+
+        <v-col cols="12" md="3">
+          <v-text-field
+              label="Ke (Elimination rate constant)"
+              v-model="Ke"
+              type="number"
+              :step="0.01"
+              @input="isKeBeingChanged = true"
+              @blur="isKeBeingChanged = false"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="12" md="9">
+          <v-slider
+              label="Ke (Elimination rate constant)"
+              v-model="Ke"
+              step="0.01"
+              :min="0"
+              :max="5"
+              thumb-label="always"
+              @mousedown.native="isKeBeingChanged = true"
+              @mouseup.native="isKeBeingChanged = false"
+          ></v-slider>
+        </v-col>
+
+        <v-col cols="12" md="3">
+          <v-text-field
+              label="Vd (Volume of Distribution)"
+              v-model="Vd"
+              type="number"
+              :step="0.01"
+              @input="isVdBeingChanged = true"
+              @blur="isVdBeingChanged = false"
+          ></v-text-field>
+        </v-col>
+        <v-col cols="12" md="9">
+          <v-slider
+              label="Vd (Volume of Distribution)"
+              v-model="Vd"
+              step="0.01"
+              :min="0"
+              :max="500"
+              thumb-label="always"
+              @mousedown.native="isVdBeingChanged = true"
+              @mouseup.native="isVdBeingChanged = false"
+          ></v-slider>
+        </v-col>
+      </v-row>
+
+      <v-btn @click="createDrugAndStartSimulation">Start Simulation</v-btn>
+      <v-btn @click="toggleSimulation">{{ isSimulating ? 'Pause' : 'Resume' }}</v-btn>
+
+      <div v-if="isSimulating" v-for="drug in drugs" :key="drug.name">
+        <p class="text-body-1">Initial Drug Dose: {{ drug.dose }}</p>
+        <p class="text-body-1">Current Plasma Concentration: {{ drug.plasmaConcentration.toFixed(2) }}</p>
+        <p class="text-body-1">Time to half life: {{ drug.timeToHalfLife() }} hours</p>
+      </div>
+
+      <div v-html="renderedFormula"></div>
+
+      <div style="display: flex;">
+        <apexchart
+            v-if="isChartVisible"
+            type="line"
+            :options="chartOptions"
+            :series="series"
+            width="740">
+        </apexchart>
+
+        <apexchart
+            v-if="isChartVisible"
+            type="line"
+            :options="staticChartOptions"
+            :series="staticSeries"
+            width="740"
+            class="ml-5">
+        </apexchart>
+      </div>
+
+    </v-card-text>
+  </v-card>
+</template>
+
+<style scoped>
+@import 'katex/dist/katex.min.css';
+@import 'apexcharts/dist/apexcharts.css';
+
+apexchart {
+  display: inline-block;
+  vertical-align: top;
+}
+</style>

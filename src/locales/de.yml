@@ -1,0 +1,58 @@
+route:
+  formulas:
+    singleIVDosing: Einzeldosierung IV
+    oralDosingPlasmaTimeCurve: Plasmazeitkurve nach oraler Dosierung
+    intravenousInfusionAndEffectOfClearance: Intravenöse Infusion und Effekt der Clearance
+    nonLinearPharmacokinetics: Nichtlineare Pharmakokinetik - Anfängliche Nullordnung gefolgt von Elimination erster Ordnung
+    multipleOralDosing: Mehrfache orale Dosierung
+    # todo| nonLinearPharmacokinetics benötigt Diskussion, danach müssen wir src/pages/formulas/nonLinearPharmacokinetics.vue ändern
+    # todo| und src/stores/route.ts
+
+pages:
+  formulas:
+    descriptions:
+      shortDescription: Kurze Beschreibung der Kurve
+      graph: Grafik
+      code: Code
+      singeIVDosing: Das einfachste Modell ist die Elimination erster Ordnung nach einer einzelnen IV-Dosis,
+        da wir nur den Eliminationsprozess berücksichtigen müssen und mit dem gesamten Medikament im Blut beginnen.
+        Es gibt viele Annahmen in allen PK-Modellen, und das sollte man im Hinterkopf behalten.
+        Man könnte fragen "Wie ist es möglich, dass ein bestimmtes Medikament garantiert so wirkt?"
+        Und Sie hätten recht! Es gibt viele Variablen zu berücksichtigen Darmstoffwechsel, Anteil des Moleküls in Salzform,
+        hepatisches Extraktionsverhältnis. Aber fangen Sie jetzt mit der einzelnen IV-Dosis an,
+        und Sie werden die wichtigsten Beziehungen zwischen den PK-Parametern, die im Arzneimitteldesign und
+        in der klinischen Entscheidungsfindung verwendet werden, verstehen.
+      oralDosingPlasmaTimeCurve: Nach einer Weile des tiefen Nachdenkens über die einzelne IV-Plasma-Zeitkurve
+        werden Sie bereit sein, über die allgemeinere, aber kompliziertere Plasma-Zeitkurve nach einer einzigen oralen Dosis nachzudenken.
+        Dies führt eine weitere Variable ein, nämlich die Absorptionsgeschwindigkeitskonstante, aber es ist immer noch eine relativ einfache Situation,
+        da wir nicht mehrere Dosen betrachten oder andere Faktoren berücksichtigen, die die Arzneimittelverfügung beeinflussen.
+      intravenousInfusionAndEffectOfClearance: In diesen IV-Infusionskurven können Sie den Effekt unterschiedlicher Clearance-Werte
+        auf die Steady-State-Konzentration eines Medikaments sehen. Medikamente, die unterschiedliche Clearance-Werte haben und mit der gleichen
+        Dosisrate in mg/h dosiert werden, werden sich bei unterschiedlichen Steady-State-Konzentrationen einpendeln.
+      nonLinearPharmacokinetics: In diesen IV-Infusionskurven können Sie den Effekt unterschiedlicher Clearance-Werte
+        auf die Steady-State-Konzentration eines Medikaments sehen. Medikamente, die unterschiedliche Clearance-Werte haben und mit der gleichen
+        Dosisrate in mg/h dosiert werden, werden sich bei unterschiedlichen Steady-State-Konzentrationen einpendeln.
+      multipleOralDosing: Schließlich betrachten wir die mehrfache orale Dosierung. Dies ist viel schwieriger zu handhaben,
+        da es mehrere Variablen zu berücksichtigen gibt, wenn man die resultierende Plasma-Zeit-Kurve darstellt.
+        Im untenstehenden Beispiel wird die Gleichung für die mehrfache orale Dosierung verwendet, wobei das regelmäßige Dosisintervall berücksichtigt wird
+        und daraus abgeleitet wird, bei welcher Dosisnummer in der Serie wir uns zu einem bestimmten Zeitpunkt befinden.
+    titles:
+      singeIVDosing: Einzeldosierung IV
+      oralDosingPlasmaTimeCurve: Plasmazeitkurve nach oraler Dosierung
+      intravenousInfusionAndEffectOfClearance: Intravenöse Infusion und Effekt der Clearance
+      nonLinearPharmacokinetics: Nichtlineare Pharmakokinetik - Anfängliche Nullordnung gefolgt von Elimination erster Ordnung
+      multipleOralDosing: Mehrfache orale Dosierung
+    parameters:
+      infusionRate: Infusionsrate(mg/h) K0
+      clearance: Clearance(L/h) Cl
+      clearance1: Clearance(L/h) Cl
+      clearance2: Clearance(L/h) Cl 2
+      clearance3: Clearance(L/h) Cl 3
+      volumeOfDistribution: Verteilungsvolumen(L) Vd
+      dose: Dosis(Mg) D
+error:
+  pageNotFound: Seite nicht gefunden
+  pageNotFoundDescription: >-
+    Die von Ihnen gesuchte Seite wurde möglicherweise entfernt, hat ihren Namen geändert oder ist vorübergehend nicht verfügbar.
+  backToHome: Zurück zur Startseite
+  backToDashboard: Zurück zum Dashboard

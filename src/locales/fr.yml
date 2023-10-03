@@ -1,0 +1,64 @@
+route:
+  formulas:
+    singleIVDosing: Dosage IV unique
+    oralDosingPlasmaTimeCurve: Courbe plasma-temps pour administration orale
+    intravenousInfusionAndEffectOfClearance: Perfusion intraveineuse et effet de la clairance
+    nonLinearPharmacokinetics: Pharmacocinétique non linéaire - Ordre zéro initial suivi d'une élimination du premier ordre
+    multipleOralDosing: Dosage oral multiple
+    # todo| `nonLinearPharmacokinetics` need discussion, after that we have to change `src/pages/formulas/nonLinearPharmacokinetics.vue`
+    # todo| and `src/stores/route.ts`
+
+pages:
+  formulas:
+    descriptions:
+      shortDescription: Brève description de la courbe
+      graph: Graphique
+      code: Code
+      singeIVDosing: Le modèle le plus simple est celui de l’élimination de premier ordre après une seule dose IV.
+        puisqu'il suffit de considérer le processus d'élimination et que nous commençons par tous les médicaments
+        Dans le sang. Il existe de nombreuses hypothèses dans tous les modèles PK et il est bon de garder cela à l’esprit.
+        Vous vous demandez peut-être:"Comment est-il possible qu’un médicament donné soit assuré de se comporter de cette manière?"
+        et tu aurais raison ! Il y a de nombreuses variables à considérer. Métabolisme intestinal, proportion de la molécule sous forme de sel,
+        taux d'extraction hépatique. Mais pour l’instant, commencez par la dose IV unique et vous commencerez à comprendre les aspects les plus critiques.
+        relations entre les paramètres pharmacocinétiques utilisés dans la conception des médicaments et la prise de décision clinique.
+
+      oralDosingPlasmaTimeCurve: Après un moment, j'ai réfléchi profondément à la courbe unique du temps plasmatique IV
+        vous serez prêt à réfléchir à la courbe plasma-temps d’une dose orale unique, plus générale mais plus compliquée.
+        Cela introduit une autre variable qui est la constante du taux d'absorption mais cela reste une situation relativement simple.
+        puisque nous n’envisageons pas de doses multiples ni d’autres facteurs affectant l’élimination des médicaments.
+
+      intravenousInfusionAndEffectOfClearance: Dans ces courbes de perfusion IV, vous pouvez voir l'effet de différentes valeurs de clairance.
+        sur la concentration à l’état d’équilibre d’un médicament. Ainsi, les médicaments qui ont des valeurs de clairance différentes et qui sont dosés au même mg/heure
+        le débit de dose se stabilisera à différentes concentrations à l’état d’équilibre.
+
+      nonLinearPharmacokinetics: Dans ces cruves de perfusion IV, vous pouvez voir l'effet de différentes valeurs de clairance
+        sur la concentration à l’état d’équilibre d’un médicament. Ainsi, les médicaments qui ont des valeurs de clairance différentes et qui sont dosés
+        au même débit de dose en mg/heure, la concentration se stabilisera à différentes concentrations à l'état d'équilibre.
+
+      multipleOralDosing: Enfin, nous envisageons des doses orales multiples. C'est une chose beaucoup plus difficile à travailler
+        car il y a plusieurs variables à prendre en compte lors du tracé de la courbe plasma-temps résultante.
+        Dans l'exemple ci-dessous, l'équation pour les doses orales multiples est utilisée en tenant compte du
+        intervalle de dosage régulier et dérivant du numéro de dose dans la série que nous prenons à un moment donné.
+    titles:
+      singeIVDosing: Dosage IV unique
+      oralDosingPlasmaTimeCurve: Courbe plasma-temps pour administration orale
+      intravenousInfusionAndEffectOfClearance: Perfusion intraveineuse et effet de la clairance
+      nonLinearPharmacokinetics: Pharmacocinétique non linéaire - Ordre zéro initial suivi d'une élimination du premier ordre
+      multipleOralDosing: Dosage oral multiple
+
+    parameters:
+      infusionRate: Débit de perfusion (mg/h) K0
+      clearance: Débit de perfusion (mg/h) K0
+      clearance1: Dégagement (L/h) Cl
+      clearance2: Dégagement (L/h) Cl 2
+      clearance3: Dégagement (L/h) Cl 3
+      volumeOfDistribution: Volume de distribution (L) Vd
+      dose: Dose (Mg) D
+
+error:
+  pageNotFound: Page non trouvée
+  pageNotFoundDescription: >-
+    La page que vous recherchez a peut-être été supprimée si son nom avait changé ou
+    est temporairement indisponible.
+  backToHome: De retour à la maison
+  backToDashboard: Retour au tableau de bord

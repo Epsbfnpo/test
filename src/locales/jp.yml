@@ -1,0 +1,48 @@
+route:
+  formulas:
+    singleIVDosing: 単回IV投与
+    oralDosingPlasmaTimeCurve: 経口投与の血中濃度-時間曲線
+    intravenousInfusionAndEffectOfClearance: 静脈内投与とクリアランスの影響
+    nonLinearPharmacokinetics: 非線形薬物動態学 - 初期のゼロ次反応に続く一次反応
+    multipleOralDosing: 複数の経口投与
+    # todo| `nonLinearPharmacokinetics`の議論が必要です。その後、`src/pages/formulas/nonLinearPharmacokinetics.vue`を変更する必要があります。
+    # todo| そして、`src/stores/route.ts`も。
+pages:
+  formulas:
+    descriptions:
+      shortDescription: 曲線の短い説明
+      graph: グラフ
+      code: コード
+      singeIVDosing: 最もシンプルなモデルは、単回IV投与後の第一次消去です。
+        これは、消去プロセスのみを考慮し、血中の全薬量から開始するためです。
+        すべてのPKモデルには多くの仮定があり、それを心に留めておくことが良いでしょう。
+        ある特定の薬がこのように動作することが保証されているのはなぜかと問うことができます。
+        そして、その答えは正しいです！ 考慮すべき変数がたくさんあります。
+        しかし、単回IV投与から始めると、薬物設計や臨床判断に使用されるPKパラメーター間の最も重要な関係を理解し始めるでしょう。
+      oralDosingPlasmaTimeCurve: 単回IV血中濃度-時間曲線について深く考えた後、
+        より一般的だが複雑な単回経口投与の血中濃度-時間曲線について考える準備が整います。
+        これには別の変数、吸収速度定数が導入されますが、複数の投与を見ていないため比較的シンプルです。
+      intravenousInfusionAndEffectOfClearance: これらのIV融合曲線では、異なるクリアランス値の影響を見ることができます。
+        同じmg/hの投与速度で投与される異なるクリアランス値を持つ薬物は、異なる定常濃度で安定します。
+      nonLinearPharmacokinetics: これらのIV融合曲線では、異なるクリアランス値の影響を見ることができます。
+        同じmg/hの投与速度で投与される異なるクリアランス値を持つ薬物は、異なる定常濃度で安定します。
+      multipleOralDosing: 最後に、複数の経口投与を考慮します。これは、結果として得られる血中濃度-時間曲線をプロットする際に考慮すべき変数がいくつかあるため、扱いが非常に難しいものです。
+    titles:
+      singeIVDosing: 単回IV投与
+      oralDosingPlasmaTimeCurve: 経口投与の血中濃度-時間曲線
+      intravenousInfusionAndEffectOfClearance: 静脈内投与とクリアランスの影響
+      nonLinearPharmacokinetics: 非線形薬物動態学 - 初期のゼロ次反応に続く一次反応
+      multipleOralDosing: 複数の経口投与
+    parameters:
+      infusionRate: 輸液速度(mg/h) K0
+      clearance: クリアランス(L/h) Cl
+      clearance1: クリアランス(L/h) Cl
+      clearance2: クリアランス(L/h) Cl 2
+      clearance3: クリアランス(L/h) Cl 3
+      volumeOfDistribution: 分布容積(L) Vd
+      dose: 投与量(Mg) D
+error:
+  pageNotFound: ページが見つかりません
+  pageNotFoundDescription: 探しているページは削除されたか、名前が変更されたか、一時的に利用できない可能性があります。
+  backToHome: ホームに戻る
+  backToDashboard: ダッシュボードに戻る

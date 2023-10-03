@@ -1,0 +1,43 @@
+name: Sync Project to Bitbucket
+
+on:
+  push:
+
+jobs:
+  sync-to-bitbucket:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo with all branches
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Checkout all branches
+        run: |
+          for branch in $(git branch -r | grep 'origin' | grep -v HEAD | sed 's/origin\///'); do
+              git checkout $branch
+          done
+
+      - name: Push to Bitbucket
+        run: |
+          git config --global user.email "unr65qcis9ukhzcg7slzj8howak2k8@bots.bitbucket.org"
+          git config --global user.name "Github Sync Action"
+          git remote add bitbucket https://x-token-auth:$BITBUCKET_ACCESS_TOKEN@bitbucket.org/comp3888-f15-01/pkcalcs.git
+          for branch in $(git branch | sed 's/* //'); do
+              git push bitbucket $branch --force
+          done
+        env:
+          BITBUCKET_ACCESS_TOKEN: ${{ secrets.BITBUCKET_ACCESS_TOKEN }}
+
+      - name: Sync deleted branches to Bitbucket
+        run: |
+          GITHUB_BRANCHES=$(git branch -r | grep 'origin' | grep -v HEAD | sed 's/origin\///' | tr '\n' ' ')
+          BITBUCKET_BRANCHES=$(git ls-remote bitbucket | grep refs/heads | sed 's/.*refs\/heads\///' | tr '\n' ' ')
+          for branch in $BITBUCKET_BRANCHES; do
+            if [[ ! " $GITHUB_BRANCHES " =~ " $branch " ]]; then
+              git push bitbucket --delete $branch
+            fi
+          done
+        env:
+          BITBUCKET_ACCESS_TOKEN: ${{ secrets.BITBUCKET_ACCESS_TOKEN }}
